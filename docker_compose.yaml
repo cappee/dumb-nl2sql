@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: ./backend
+    ports: 
+      - 8007:8000
+    container_name: backend
+  frontend:
+    build: ./frontend
+    ports:
+      - 8006:8000
+    depends_on:
+      - backend
+    container_name: frontend
+  database:
+    image: mariadb:11.7.2-ubi9
+    container_name: mariadb
+    volumes:
+      - ./mariadb_data:/var/lib/mysql
+      - ./mariadb_init:/docker-entrypoint-initdb.d
+    ports:
+      - 3006:3006
+    environment:
+      MARIADB_ROOT_PASSWORD: admin
