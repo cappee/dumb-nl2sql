@@ -19,11 +19,12 @@ services:
     container_name: frontend
   database:
     image: mariadb:11.7.2-ubi9
-    container_name: mariadb
+    container_name: database
     volumes:
       - ./mariadb_data:/var/lib/mysql
       - ./mariadb_init:/docker-entrypoint-initdb.d
     ports:
-      - 3007:3006
+      - 3307:3306
     environment:
       MARIADB_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: movies_db
