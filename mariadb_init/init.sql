@@ -2,29 +2,29 @@ CREATE DATABASE IF NOT EXISTS movies_db;
 
 USE movies_db;
 
-
 CREATE USER 'py'@'%' IDENTIFIED BY 'esonero';
 GRANT ALL PRIVILEGES ON movies_db.* TO 'py'@'%';
 FLUSH PRIVILEGES;
-
 
 -- Directors table
 CREATE TABLE directors(
     director_id INT AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
     age INT NOT NULL,
-    PRIMARY KEY(director_id)
+    PRIMARY KEY(director_id),
+    UNIQUE(name)
 );
 
 -- Movies table
 CREATE TABLE movies (
     movie_id INT AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
+    title VARCHAR(50) NOT NULL,
     release_year INT NOT NULL,
     genre VARCHAR(30) NOT NULL,
     director_id INT NOT NULL,
     PRIMARY KEY(movie_id),
-    FOREIGN KEY(director_id) REFERENCES directors(director_id)
+    FOREIGN KEY(director_id) REFERENCES directors(director_id),
+    UNIQUE(title, release_year) -- Ensure that the same movie cannot be added twice (remake allowed)
 );
 
 -- Platforms table
@@ -73,7 +73,7 @@ INSERT INTO directors (name, age) VALUES
 ('Denis Villeneuve', 57);
 
 
-INSERT INTO movies (name, release_year, genre, director_id) VALUES
+INSERT INTO movies (title, release_year, genre, director_id) VALUES
 ('Inception', 2010, 'Fantascienza', 1),
 ('Parasite', 2019, 'Dramma', 2),
 ('Interstellar', 2014, 'Fantascienza', 1),
