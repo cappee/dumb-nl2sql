@@ -1,24 +1,17 @@
 from fastapi import HTTPException
 import mariadb
 
-from backend.models.models import Data, TableSchema
+from backend.models.models import Data
 
 
-def db_connection() -> mariadb.Connection:
-    try:
-        conn = mariadb.connect(
-            host="database",
-            port=3306,
-            user="py",
-            password="esonero",
-            database="movies_db"
-        )
-        return conn
-    except mariadb.Error as e:
-        raise HTTPException(
-            status_code=503,
-            detail=f"Error during MariaDB connection: {str(e)}"
-        )
+def get_connection() -> mariadb.Connection:
+    return mariadb.connect(
+        host="database",
+        port=3306,
+        user="py",
+        password="esonero",
+        database="movies_db"
+    )
 
 
 def execute_query(connection: mariadb.Connection, query: str):
@@ -32,26 +25,29 @@ def execute_query(connection: mariadb.Connection, query: str):
     return results
 
 
-def get_schema(connection: mariadb.Connection) -> list[TableSchema]:
-    schema: list[TableSchema] = list()
+def execute_query_columns(connection: mariadb.Connection, query: str):
+    cursor: mariadb.Cursor = connection.cursor()
+    cursor.execute(query)
 
-    tables = execute_query(connection, "SHOW tables;")
-    for table in tables:
-        columns = execute_query(connection, f"SHOW columns FROM {table[0]}")
-        for column in columns:
-            schema.append(TableSchema(table_name=table[0], table_column=column[0]))
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
 
-    return schema
+    results = [dict(zip(columns, row)) for row in rows]
+
+    connection.commit()
+
+    cursor.close()
+    return results
 
 
-def add_data_to_db(connection: mariadb.Connection, data: Data) -> bool:
+def insert_data(connection: mariadb.Connection, data: Data) -> bool:
     try:
         cursor = connection.cursor()
         
         """Search for director in db, if not found, insert it"""
         cursor.execute(
-            "SELECT director_id FROM directors WHERE name = ? AND age = ?", 
-            (data.director, data.director_age))
+            "SELECT director_id FROM directors WHERE name = ?", 
+            (data.director,))
         row = cursor.fetchone()
 
         if row:
@@ -62,8 +58,8 @@ def add_data_to_db(connection: mariadb.Connection, data: Data) -> bool:
             director_id = cursor.lastrowid
 
         """Insert movie into db"""
-        cursor.execute("INSERT INTO movies (title, release_year, genre, director_id) VALUES (?, ?, ?, ?)",
-                    (data.title, data.release_year, data.genre, director_id))
+        cursor.execute("INSERT INTO movies (name, release_year, genre, director_id) VALUES (?, ?, ?, ?)",
+                    (data.name, data.release_year, data.genre, director_id))
         movie_id = cursor.lastrowid
 
         """Search for platforms in db, if not found, insert them and create a relation with the movie"""

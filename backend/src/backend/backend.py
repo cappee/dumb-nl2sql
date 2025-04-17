@@ -1,21 +1,14 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 
-from backend.db.mariadb import db_connection, get_schema
-from backend.models.models import TableSchema
+from backend.endpoints.search import search
+from backend.endpoints.schema import schema
 from backend.endpoints.add import add
 
 
 app = FastAPI()
 app.title = "Movies API"
+app.description = "API for managing movies and their details."
 
-
-@app.get("/search/")
-def search(question: str):
-    pass
-
-
-@app.get("/schema_summary/")
-def schema_summmary(conn = Depends(db_connection)) -> list[TableSchema]:
-    return get_schema(conn)
-
+app.include_router(search.router)
+app.include_router(schema.router)
 app.include_router(add.router)
