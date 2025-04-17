@@ -2,6 +2,7 @@ CREATE DATABASE IF NOT EXISTS movies_db;
 
 USE movies_db;
 
+-- Create user with only needed privileges
 CREATE USER 'py'@'%' IDENTIFIED BY 'esonero';
 GRANT ALL PRIVILEGES ON movies_db.* TO 'py'@'%';
 FLUSH PRIVILEGES;

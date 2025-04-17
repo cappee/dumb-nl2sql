@@ -4,14 +4,18 @@ import mariadb
 from backend.models.models import Data
 
 
-def get_connection() -> mariadb.Connection:
-    return mariadb.connect(
+def db_connection():
+    conn = mariadb.connect(
         host="database",
         port=3306,
         user="py",
         password="esonero",
         database="movies_db"
     )
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 
 def execute_query(connection: mariadb.Connection, query: str):

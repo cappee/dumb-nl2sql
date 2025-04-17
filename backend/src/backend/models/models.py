@@ -21,14 +21,6 @@ class Data(BaseModel):
         if self.platform2 and not self.platform1:
             raise ValueError("Field 'platform2' requires 'platform1' to be present")
         return self
-    
-
-class ErrorResponse(BaseModel):
-    detail: str
-
-
-class SuccessResponse(BaseModel):
-    status: str = Field("OK")
 
 
 class Property(BaseModel):
@@ -40,6 +32,10 @@ class SearchResponse(BaseModel):
     item_type: str
     properties: list[Property]
 
+
+class AddResponse(BaseModel):
+    status: str = Field("OK")
+    
 
 class AddRequest(BaseModel):
     data_line: str = Field(..., description="CSV formatted string containing movie data")

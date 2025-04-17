@@ -1,23 +1,14 @@
 import csv
 import mariadb
-from typing import Annotated, Optional
-from fastapi import APIRouter, Body, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import ValidationError
 
-from backend.db.mariadb import insert_data
-from backend.models.models import AddRequest, Data, ErrorResponse, SuccessResponse
-from backend.db.mariadb import get_connection
+from backend.db.mariadb import insert_data, db_connection
+from backend.models.models import AddRequest, Data, AddResponse
 
 
 router = APIRouter()
-
-
-def db_connection():
-    conn = get_connection()
-    try:
-        yield conn
-    finally:
-        conn.close()
 
 
 def csv2dict(line: str) -> Optional[dict[str, str]]:
@@ -32,20 +23,9 @@ def csv2dict(line: str) -> Optional[dict[str, str]]:
 
 @router.post(
     "/add/",
-    summary="Add a new movie from a CSV-formatted string",
-    response_description="Movie added successfully",
-    responses={
-        422: {
-            "description": "Invalid input format or failed validation",
-            "model": ErrorResponse
-        },
-        500: {
-            "description": "Database error or internal server error",
-            "model": ErrorResponse
-        }
-    }
+    summary="Add a new movie from a CSV-formatted string"
 )
-def add(request: AddRequest, conn: mariadb.Connection = Depends(db_connection)) -> SuccessResponse:
+def add(request: AddRequest, conn: mariadb.Connection = Depends(db_connection)) -> AddResponse:
     """
     Adds a new movie to the database.
 
@@ -53,15 +33,6 @@ def add(request: AddRequest, conn: mariadb.Connection = Depends(db_connection)) 
     ```
     Name,Director,DirectorAge,ReleaseYear,Genre,Platform1,Platform2
     ```
-    - Example:
-      ```
-      The Social Network,David Fincher,62,2010,Drama,Netflix,Amazon Prime Video
-      ```
-
-    Returns:
-    - `200 OK` if the data was successfully added.
-    - `422` if the input string is missing fields or fails validation.
-    - `500` if there was an internal error while inserting into the database.
     """
     data_line = request.data_line.strip()
     print(f"Received data line: {data_line}")
@@ -69,7 +40,7 @@ def add(request: AddRequest, conn: mariadb.Connection = Depends(db_connection)) 
         data = Data.model_validate(csv2dict(data_line))
 
         if insert_data(conn, data):
-            return SuccessResponse(status="ok")
+            return AddResponse(status="ok")
         else:
             raise HTTPException(
                 status_code=500,
