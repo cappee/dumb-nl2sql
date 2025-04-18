@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/schema_summary/", 
+    "/schema_summary", 
     summary="Get DB schema summary"
 )
 def schema_summmary(conn = Depends(db_connection)) -> list[DatabaseSchema]:

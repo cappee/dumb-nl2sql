@@ -22,7 +22,7 @@ def csv2dict(line: str) -> Optional[dict[str, str]]:
 
 
 @router.post(
-    "/add/",
+    "/add",
     summary="Add a new movie from a CSV-formatted string"
 )
 def add(request: AddRequest, conn: mariadb.Connection = Depends(db_connection)) -> AddResponse:
@@ -35,7 +35,6 @@ def add(request: AddRequest, conn: mariadb.Connection = Depends(db_connection)) 
     ```
     """
     data_line = request.data_line.strip()
-    print(f"Received data line: {data_line}")
     try:
         data = Data.model_validate(csv2dict(data_line))
 
