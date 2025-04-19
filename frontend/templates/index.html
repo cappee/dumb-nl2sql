@@ -1,150 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
+
 <head>
   <meta charset="UTF-8">
-  <title>Midterm [2044279]</title>
+  <title>Esonero [2044279]</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Figtree&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --pico-font-family-monospace: 'Geist Mono', monospace;
-      --pico-font-family-sans-serif: 'Inter', sans-serif;
-    }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    main.container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 1rem 1.5rem;
-    }
-
-    h1 {
-      margin: 0.5rem 0 1rem 0;
-    }
-
-    .layout {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      grid-template-areas: "controls console";
-      gap: 1.5rem;
-      align-items: stretch;
-      overflow: hidden;
-    }
-
-    .controls {
-      grid-area: controls;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      overflow-y: auto;
-      height: 100%;
-    }
-
-    .controls h4 {
-      margin: 0.5rem 0 0.2rem;
-    }
-
-    .controls form {
-      margin: 0;
-    }
-
-    .console {
-      grid-area: console;
-      border-left: 2px solid var(--pico-muted-border-color, #ccc);
-      padding-left: 1rem;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    textarea.console-output {
-      flex: 1;
-      width: 100%;
-      resize: none;
-      padding: 0.5rem;
-      font-family: var(--pico-font-family-monospace);
-      font-size: 11pt;
-      overflow-y: auto;
-    }
-
-    @media (max-width: 768px) {
-			html body {
-				overflow: auto;
-			}
-
-      .layout {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-          "controls"
-          "console";
-      }
-
-      .console {
-        border-left: none;
-        border-top: 2px solid var(--pico-muted-border-color, #ccc);
-        padding-left: 0;
-				height: 25rem;
-        padding-top: 1rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.violet.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Figtree:wght@600&family=Geist+Mono:wght@100..900&family=Inter:opsz,wght@14..32,500&display=swap"
+    rel="stylesheet">
 </head>
+
 <body>
   <main class="container">
-    <h1><a href="/">Movies API</a></h1>
+    <h1 class="title"><a class="no-link" href="/">Movies API 📽️</a></h1>
 
     <div class="layout">
-      <!-- Colonna sinistra -->
       <div class="controls">
-        <h4>Schema summary</h4>
-        <form method="get" action="/schema_summary">
-          <button type="submit">Schema</button>
-        </form>
+        <section>
+          <hgroup>
+            <h4>/schema_summary</h4>
+            <p class="small">Ottieni informazioni sulla struttura della base di dati</p>
+          </hgroup>
+          <form method="get" action="/schema_summary">
+            <button type="submit">Schema</button>
+          </form>
+        </section>
 
-        <h4>Search</h4>
-        <form method="get" action="/search">
-          <input type="text" name="question" placeholder="Quali registi hanno fatto più di un film?" required>
-          <button type="submit">Search</button>
-        </form>
+        <section>
+          <hgroup>
+            <h4>/search</h4>
+            <p class="small">Esegui una query</p>
+          </hgroup>
+          <form method="get" action="/search">
+            <input class="monospace" type="text" name="question" placeholder="Quali registi hanno fatto più di un film?"
+              required>
+            <button type="submit">Cerca</button>
+          </form>
+        </section>
 
-        <h4>Add</h4>
-        <form method="post" action="/add">
-          <input type="text" name="data_line" placeholder="The Green Mile,Frank Darabont,65,1999,Drama,Netflix," required>
-          <button type="submit">Add</button>
-        </form>
+        <section>
+          <hgroup>
+            <h4>/add</h4>
+            <p class="small">Inserisci un nuovo film nella base di dati</p>
+          </hgroup>
+          <form method="post" action="/add">
+            <input class="monospace" type="text" name="data_line"
+              placeholder="The Green Mile,Frank Darabont,65,1999,Drama,Netflix," required>
+            <button type="submit">Aggiungi</button>
+          </form>
+        </section>
       </div>
 
-      <!-- Colonna destra -->
       <div class="console">
-        <h4>Output</h4>
-        {% if not message %}
-        <p>Status code: XXX</p>
-        {% else %}
-        <p>{{ message }}</p>
-        {% endif %}
-        <textarea class="console-output" readonly>
-{% if results %}
-{{ results }}
-{% endif %}
-        </textarea>
+        <hgroup>
+          <h4>Output</h4>
+          {% if status_code %}
+          {% if status_code >= 200 and status_code < 300 %} <p class="small">Status code: {{ status_code }} ✅</p>
+            {% else %}
+            <p>Status code: {{ status_code }} ❌</p>
+            {% endif %}
+            {% else %}
+            <p class="small">Stuff will appear here! 👇🏼</p>
+            {% endif %}
+        </hgroup>
+        <textarea class="console-output" readonly>{% if results %}{{ results }}{% else %}...{% endif %}</textarea>
       </div>
     </div>
   </main>
+  <footer class="container">
+    <small>Built with ❤️ by <a href="https://github.com/cappee">Gabriele Cappellaro</a></small>
+  </footer>
 </body>
+
 </html>

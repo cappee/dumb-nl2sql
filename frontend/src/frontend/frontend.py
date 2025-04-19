@@ -1,11 +1,14 @@
 from fastapi import FastAPI, Form, Query, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 
 from frontend.api.api import API
 
 app = FastAPI(title="nl2sql HTML Interface")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
@@ -21,7 +24,7 @@ def search(request: Request, question: str = Query(...)):
     return templates.TemplateResponse("index.html", {
         "request": request, 
         "results": json.dumps(results, indent=2), 
-        "message": f"Status code: {response.status_code}"
+        "status_code": response.status_code
         })
     
 
@@ -32,7 +35,7 @@ def schema_summary(request: Request):
     return templates.TemplateResponse("index.html", {
         "request": request, 
         "results": json.dumps(results, indent=2), 
-        "message": f"Status code: {response.status_code}"
+        "status_code": response.status_code
         })
 
 
@@ -44,5 +47,5 @@ def add(request: Request, data_line: str = Form(...)):
     return templates.TemplateResponse("index.html", {
         "request": request, 
         "results": json.dumps(results, indent=2), 
-        "message": f"Status code: {response.status_code}"
+        "status_code": response.status_code
         })
