@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import ValidationError
 
 from backend.db.mariadb import insert_data, db_connection
-from backend.models.models import AddRequest, Data, AddResponse
+from backend.endpoints.add.models import AddRequest, Data, AddResponse
 
 
 router = APIRouter()

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from backend.models.models import Property, SearchResponse
 from backend.endpoints.search.nl2sql import Nl2SQL
 from backend.db.mariadb import db_connection, execute_query
+from backend.endpoints.search.models import SearchResponse, Property
 
 
 router = APIRouter()

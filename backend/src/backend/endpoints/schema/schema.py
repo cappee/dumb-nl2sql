@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from backend.db.mariadb import db_connection, execute_query
-from backend.models.models import DatabaseSchema
+from backend.endpoints.schema.models import DatabaseSchema
 
 
 router = APIRouter()

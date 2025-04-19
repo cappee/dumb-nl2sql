@@ -1,7 +1,7 @@
 import requests
 from urllib.parse import urljoin, quote
 
-from frontend.models.models import APIResponse
+from frontend.api.models import APIResponse
 
 #TODO: put in env var
 BASE_URL = "http://backend:8000"

@@ -1,6 +1,6 @@
 import re
 
-from backend.endpoints.search.query import Query
+from backend.endpoints.search.models import Query
 
 
 class Nl2SQL:

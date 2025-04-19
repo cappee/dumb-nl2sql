@@ -1,9 +1,16 @@
+from typing import Callable, TypedDict
 from pydantic import BaseModel
+
+
+class Query(TypedDict):
+    sql: Callable[..., str]
+    item_type: str
+    fields: list[str]
 
 
 class Property(BaseModel):
     property_name: str
-    propery_value: str
+    property_value: str
 
 
 class SearchResponse(BaseModel):

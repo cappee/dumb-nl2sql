@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 import mariadb
 
-from backend.models.models import Data
+from backend.endpoints.add.models import Data
 
 
 def db_connection():
@@ -29,21 +29,6 @@ def execute_query(connection: mariadb.Connection, query: str):
     return results
 
 
-def execute_query_columns(connection: mariadb.Connection, query: str):
-    cursor: mariadb.Cursor = connection.cursor()
-    cursor.execute(query)
-
-    rows = cursor.fetchall()
-    columns = [desc[0] for desc in cursor.description]
-
-    results = [dict(zip(columns, row)) for row in rows]
-
-    connection.commit()
-
-    cursor.close()
-    return results
-
-
 def insert_data(connection: mariadb.Connection, data: Data) -> bool:
     try:
         cursor = connection.cursor()
@@ -57,12 +42,12 @@ def insert_data(connection: mariadb.Connection, data: Data) -> bool:
         if row:
             director_id = row[0]
         else:
-            cursor.execute("INSERT INTO directors (name, age) VALUES (?, ?)", 
+            cursor.execute("INSERT IGNORE INTO directors (name, age) VALUES (?, ?)", 
                         (data.director, data.director_age))
             director_id = cursor.lastrowid
 
         """Insert movie into db"""
-        cursor.execute("INSERT INTO movies (name, release_year, genre, director_id) VALUES (?, ?, ?, ?)",
+        cursor.execute("INSERT IGNORE INTO movies (name, release_year, genre, director_id) VALUES (?, ?, ?, ?)",
                     (data.name, data.release_year, data.genre, director_id))
         movie_id = cursor.lastrowid
 
@@ -74,11 +59,11 @@ def insert_data(connection: mariadb.Connection, data: Data) -> bool:
             if row:
                 platform_id = row[0]
             else:
-                cursor.execute("INSERT INTO platforms (name) VALUES (?)", 
+                cursor.execute("INSERT IGNORE INTO platforms (name) VALUES (?)", 
                             (platform,))
                 platform_id = cursor.lastrowid
 
-            cursor.execute("INSERT INTO watch_on (movie_id, platform_id) VALUES (?, ?)",
+            cursor.execute("INSERT IGNORE INTO watch_on (movie_id, platform_id) VALUES (?, ?)",
                         (movie_id, platform_id))
             
         """Commit the transaction"""
