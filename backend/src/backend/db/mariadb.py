@@ -1,3 +1,4 @@
+import csv
 from fastapi import HTTPException
 import mariadb
 
@@ -75,3 +76,22 @@ def insert_data(connection: mariadb.Connection, data: Data) -> bool:
             status_code=500,
             detail=f"Error inserting data into database: {str(e)}"
         )
+    
+
+def is_empty(connection: mariadb.Connection) -> bool:
+    if execute_query(connection, "SELECT COUNT(*) FROM movies")[0][0] == 0:
+        return True
+    return False
+
+
+def populate_if_empty(connection: mariadb.Connection):
+    if not is_empty(connection):
+        return
+    
+    with open("backend/data.tsv", encoding="utf-8") as file:
+        tsv = csv.DictReader(file, delimiter="\t")
+        data = [Data.model_validate(row) for row in tsv]
+
+        for movie in data:
+            insert_data(connection, movie)
+    

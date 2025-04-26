@@ -5,13 +5,14 @@ services:
       - 8003:8000
     container_name: backend
     depends_on:
-      - database
+      database:
+        condition: service_healthy
   frontend:
     build: ./frontend
     ports:
       - 8001:8000
-    #environment:
-    #  BACKEND_URL: http://backend:8003
+    environment:
+      BACKEND_URL: http://backend:8000
     depends_on:
       - backend
     container_name: frontend
@@ -26,3 +27,9 @@ services:
     environment:
       MARIADB_ROOT_PASSWORD: admin
       MYSQL_DATABASE: movies_db
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3

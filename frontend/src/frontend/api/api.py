@@ -1,10 +1,10 @@
+import os
 import requests
 from urllib.parse import urljoin, quote
 
 from frontend.api.models import APIResponse
 
-#TODO: put in env var
-BASE_URL = "http://backend:8000"
+BASE_URL = os.getenv("BACKEND_URL", "http://backend:8000")
 
 class API():
 
