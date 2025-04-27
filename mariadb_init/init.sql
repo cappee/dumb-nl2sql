@@ -25,14 +25,15 @@ CREATE TABLE movies (
     director_id INT NOT NULL,
     PRIMARY KEY(movie_id),
     FOREIGN KEY(director_id) REFERENCES directors(director_id),
-    UNIQUE(name, release_year) -- Ensure that the same movie cannot be added twice (remake allowed)
+    UNIQUE(name)
 );
 
 -- Platforms table
 CREATE TABLE platforms(
     platform_id INT AUTO_INCREMENT,
     name VARCHAR(30) NOT NULL,
-    PRIMARY KEY(platform_id)
+    PRIMARY KEY(platform_id),
+    UNIQUE(name)
 );
 
 -- Table that links movies and platform with a many-to-many relationship

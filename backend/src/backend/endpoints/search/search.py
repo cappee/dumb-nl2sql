@@ -20,6 +20,7 @@ def search(question: str, conn = Depends(db_connection)) -> list[SearchResponse]
     """
     nl2sql = Nl2SQL(question)
 
+    # Raise a particular error if the given question is malformed
     if not nl2sql.is_valid():
         raise HTTPException(status_code=422, detail="Invalid question, unable to generate SQL query.")
     

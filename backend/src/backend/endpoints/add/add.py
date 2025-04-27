@@ -38,15 +38,17 @@ def add(request: AddRequest, conn: mariadb.Connection = Depends(db_connection)) 
     try:
         data = Data.model_validate(csv2dict(data_line))
 
+        # Check if data is inserted correctly
         if insert_data(conn, data):
             return AddResponse(status="ok")
         else:
+            # If the data was not inserted correctly, raise an error
             raise HTTPException(
                 status_code=500,
                 detail="Failed to insert data into the database"
             )
-
-    except(ValidationError, ValueError) as e:
+    except (ValidationError, ValueError) as e:
+        # Raise a particular error if the given data line is not malformed
         raise HTTPException(
             status_code=422,
             detail=f"Malformed input: {str(e)}"
